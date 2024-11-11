@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'helloworld_app:latest'
+        CONTAINER_NAME = 'helloworld-container'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('src/resources/devops-interview/helloworld') { // might be wrong path
+                    sh './gradlew clean build'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}", "src/resources/devops-interview/helloworld") // double-check context path
+                }
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                ansiblePlaybook(
+                    playbook: 'ansible/playbook.yml',
+                    inventory: 'ansible/inventory.ini' // ensure inventory file is correct
+                )
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment was successful!'
+        }
+        failure {
+            echo 'Deployment failed.'
+        }
+    } //bruh need find the way
+    // i can try grw
+}

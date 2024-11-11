@@ -1,0 +1,91 @@
+---
+- name: Install, configure, and run docker container with setup
+  hosts: local
+  become: yes
+
+  vars:
+    project_dir: "{{ playbook_dir }}/../helloworld"  # зміна на підкаталог
+    docker_image: helloworld_app
+    docker_container: helloworld_app
+    docker_tag: latest
+
+  tasks:
+    - name: Update and install required packages
+      apt:
+        update_cache: yes
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - docker-ce
+        state: present
+
+    - name: Add Docker GPG key
+      ansible.builtin.command: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+        gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      args:
+        creates: /usr/share/keyrings/docker-archive-keyring.gpg
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable"
+        state: present
+        filename: docker
+
+    - name: Ensure docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create topsecret.txt in /etc directory
+      copy:
+        content: "t0ps3cr3t"
+        dest: /etc/topsecret.txt
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Create project directory
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_env.USER }}"
+        group: "{{ ansible_env.USER }}"
+
+    - name: Check if Dockerfile exists
+      stat:
+        path: "{{ project_dir }}/Dockerfile"
+      register: dockerfile_stat
+
+    - name: Dockerfile does exist
+      debug:
+        msg: "Dockerfile does exist in {{ project_dir }}"
+      when: dockerfile_stat.stat.exists
+
+    - name: Build Docker image
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        tag: "{{ docker_tag }}"
+        source: build
+        build:
+          path: "{{ project_dir }}"
+        state: present
+      when: dockerfile_stat.stat.exists
+
+    - name: Ensure Docker container is running
+      community.docker.docker_container:
+        name: "{{ docker_container }}"
+        image: "{{ docker_image }}:{{ docker_tag }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:8080"
+
+    - name: Remove dangling docker images
+      command: docker image prune -f
+      when: dockerfile_stat.stat.exists
+

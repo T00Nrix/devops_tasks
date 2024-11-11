@@ -1,0 +1,7 @@
+{
+    "jar_name": "helloworld.jar",
+    "project_dir": "../helloworld",
+    "build_command": ["./gradlew", "clean", "build"],
+    "test_command": ["java", "-jar"],
+    "test_exp_value": "Hello World"
+}

@@ -1,0 +1,40 @@
+2024-11-11 08:53:16,117; ERROR;  [NOT FOUND] Config file: config/config_jar_builder.json
+2024-11-11 09:12:27,255; ERROR;  [NOT FOUND] Config file: configs/config_jar_builder.json
+2024-11-11 09:12:27,256; ERROR;  Configuration not loaded. Skipping build.
+2024-11-11 09:12:27,256; ERROR;  Configuration not loaded. Skipping test.
+2024-11-11 09:12:42,700; ERROR;  [NOT FOUND] Config file: configs/config_jar_builder.json
+2024-11-11 09:12:42,701; ERROR;  Configuration not loaded. Skipping build.
+2024-11-11 09:12:42,701; ERROR;  Configuration not loaded. Skipping test.
+2024-11-11 09:13:06,856; INFO;  [LOADING] Config file from ../configs/config_jar_builder.json
+2024-11-11 09:13:06,856; INFO;  [STARTING] Building jar in path: ../helloworld
+2024-11-11 09:13:53,572; ERROR;  [FAILED] Building jar: /home/grim/DevOps/prt/helloworld/build/libs/helloworld.jar
+2024-11-11 09:13:53,572; ERROR;  Exception in thread "main" javax.net.ssl.SSLException: Tag mismatch
+	at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:132)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:378)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:321)
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:316)
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:123)
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1509)
+	at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1480)
+	at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:1066)
+	at java.base/java.io.BufferedInputStream.read1(BufferedInputStream.java:345)
+	at java.base/java.io.BufferedInputStream.implRead(BufferedInputStream.java:420)
+	at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:399)
+	at java.base/sun.net.www.MeteredStream.read(MeteredStream.java:131)
+	at java.base/java.io.FilterInputStream.read(FilterInputStream.java:119)
+	at java.base/sun.net.www.protocol.http.HttpURLConnection$HttpInputStream.read(HttpURLConnection.java:3677)
+	at java.base/sun.net.www.protocol.http.HttpURLConnection$HttpInputStream.read(HttpURLConnection.java:3670)
+	at org.gradle.wrapper.Install.forceFetch(SourceFile:2)
+	at org.gradle.wrapper.Install$1.call(SourceFile:8)
+	at org.gradle.wrapper.GradleWrapperMain.main(SourceFile:67)
+Caused by: javax.crypto.AEADBadTagException: Tag mismatch
+	at java.base/com.sun.crypto.provider.GaloisCounterMode$GCMDecrypt.doFinal(GaloisCounterMode.java:1652)
+	at java.base/com.sun.crypto.provider.GaloisCounterMode.engineDoFinal(GaloisCounterMode.java:458)
+	at java.base/javax.crypto.Cipher.doFinal(Cipher.java:2543)
+	at java.base/sun.security.ssl.SSLCipher$T13GcmReadCipherGenerator$GcmReadCipher.decrypt(SSLCipher.java:1908)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.decodeInputRecord(SSLSocketInputRecord.java:264)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.decode(SSLSocketInputRecord.java:181)
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:111)
+	... 13 more
+
+2024-11-11 09:13:53,572; CRITICAL;  [FAILED] Test jar: /home/grim/DevOps/prt/helloworld/build/libs/helloworld.jar - jar path does not exist

@@ -1,0 +1,9 @@
+{
+    "vagrant_autobuild_script": "../vagrant/auto_build.sh",
+    "ansible_playbook": "../ansible/playbook.yml",
+    "ansible_inventory": "../ansible/inventory.ini",
+    "light_checker_script": "../light_checker/lightChecker.py",
+    "docker_app_name": "helloworld_app",
+    "on_time": 6,
+    "off_time": 22
+}
