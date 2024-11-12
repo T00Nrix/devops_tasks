@@ -5,7 +5,7 @@ This repository contains a DevOps project that demonstrates the automation of bu
 - Vagrant
 - Ansible
 - Docker 
-- Jenkins (not done)
+- GitHub Actions Pipeline
 - Python scripts
 
 ## Table of Contents
@@ -24,7 +24,7 @@ This repository contains a DevOps project that demonstrates the automation of bu
   - [auto_build.sh](#auto_build.sh)
 - [Ansible Playbook](#ansible-playbook)
 - [Light Checker](#light-checker)
-- [Jenkins Pipeline](#jenkins-pipeline)
+- [GitHub Actions Pipeline](#GitHub Actions Pipeline)
 - [Notes](#notes)
 - [Conclusion](#conclusion)
 
@@ -33,45 +33,47 @@ This repository contains a DevOps project that demonstrates the automation of bu
 ```
 .
 ├── ansible
-│   ├── inventory.ini
-│   └── playbook.yml
+│   ├── inventory.ini
+│   └── playbook.yml
 ├── configs
-│   ├── config_jar_builder.json
-│   └── config.json
+│   ├── config_jar_builder.json
+│   └── config.json
 ├── helloworld
-│   ├── build.gradle
-│   ├── Dockerfile
-│   ├── gradle
-│   │   └── wrapper
-│   │       ├── gradle-wrapper.jar
-│   │       └── gradle-wrapper.properties
-│   ├── gradlew
-│   ├── gradlew.bat
-│   ├── settings.gradle
-│   └── src
-│       └── main
-│           ├── java
-│           │   └── com
-│           │       └── ilionx
-│           │           └── helloworld
-│           │               └── HelloworldApplication.java
-│           └── resources
-│               └── application.properties
-├── jenkins
-│   └── Jenkinsfile
+│   ├── build.gradle
+│   ├── Dockerfile
+│   ├── gradle
+│   │   └── wrapper
+│   │       ├── gradle-wrapper.jar
+│   │       └── gradle-wrapper.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   ├── settings.gradle
+│   └── src
+│       └── main
+│           ├── java
+│           │   └── com
+│           │       └── ilionx
+│           │           └── helloworld
+│           │               └── HelloworldApplication.java
+│           └── resources
+│               └── application.properties
 ├── light_checker
-│   ├── lightChecker.py
-│   └── unitTestLightChecker.py
+│   ├── lightChecker.py
+│   ├── __pycache__
+│   │   └── lightChecker.cpython-312.pyc
+│   └── unitTestLightChecker.py
 ├── provisioning
-│   └── asdf.yml
+│   └── asdf.yml
 ├── README.md
 ├── scripts
-│   ├── auto_build_all.py
-│   ├── docker_builder.py
-│   └── jar_builder.py
+│   ├── auto_build_all.py
+│   ├── docker_builder.py
+│   └── jar_builder.py
 └── vagrant
     ├── auto_build.sh
     └── Vagrantfile
+
+
 ```
 
 ## Prerequisites
@@ -84,7 +86,7 @@ This repository contains a DevOps project that demonstrates the automation of bu
 - Python 3
 - Java (Temurin 21)
 - Gradle
-- Jenkins (for CI/CD pipeline) (not done)
+- GitHub Actions
 
 ## Setup Instructions
 
@@ -139,14 +141,15 @@ Make sure the scripts are executable:
 chmod +x scripts/*.py
 ```
 
-### 5. Jenkins Pipeline Setup (not done...)
-Jenkinsfile is provided in the `jenkins` directory.
-
-
+### 5. GitHub Actions Workflow: Build and Dockerize
+This repository utilizes a GitHub Actions workflow to automate the process of building and containerizing the Spring Boot application. The workflow ensures that every change pushed to the main branch or submitted via a pull request is automatically built into a Docker image, streamlining the development and deployment process.
 Steps:
-1. Install Jenkins
-2. Install Required Plugins: Docker Pipeline Plugin, Ansible Plugin
-3. Create a New Pipeline Job in Jenkins and configure SCM to point to your repository containing the Jenkinsfile.
+1. Checkout Repository: Clones the repository code.
+2. Set up QEMU: Enables cross-platform builds (optional for single architecture).
+3. Set up Docker Buildx: Configures advanced Docker build capabilities.
+4. Cache Docker Layers: Caches Docker layers to speed up future builds.
+5. Build Docker Image: Builds the Docker image using the Dockerfile in the helloworld directory and tags it as helloworld_app:latest.
+6. List Docker Images: Displays the built Docker images for verification.
 
 ## Scripts Explanation
 
@@ -168,14 +171,13 @@ The Ansible playbook located at `ansible/playbook.yml` automates the provisionin
 ## Light Checker
 The `light_checker` directory contains `lightChecker.py`, which determines whether the application should be running based on certain conditions.
 
-## Jenkins Pipeline
-The Jenkins pipeline automates the build, test, and deployment process.
-(not done)
+## GitHub Actions Pipeline
+GitHub Actions pipeline automates the build, test.
 
 ## Notes
 - Configuration Files: Store all configurations in the configs directory in JSON format.
 - Permissions: Ensure scripts have execution permissions.
-- Some moment's can work not 100% correct.
+
 
 ## Conclusion
 This project demonstrates the integration of various DevOps tools to automate the build, test, and deployment processes.
