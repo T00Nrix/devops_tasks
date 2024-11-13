@@ -128,3 +128,4 @@ https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stab
       ansible.builtin.command:
         cmd: docker image prune -f
       when: dockerfile_stat.stat.exists
+      changed_when: true # we need this ch
