@@ -13,7 +13,7 @@
     - name: Update apt package index
       ansible.builtin.apt:
         update_cache: true
-      ignore_errors: true # try/ex struct
+      failed_when: false  # ch ignore_errors to failed_when: false
 
     - name: Install required packages
       ansible.builtin.apt:
@@ -35,7 +35,8 @@
 
     - name: Set up the Docker stable repository
       ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         state: present
         update_cache: true
 
@@ -60,7 +61,7 @@
       ansible.builtin.command:
         cmd: docker --version
       register: docker_version_output
-      changed_when: false # mark don't ch the system
+      changed_when: false
 
     - name: Output Docker version
       ansible.builtin.debug:
