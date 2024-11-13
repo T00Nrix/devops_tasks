@@ -1,47 +1,73 @@
 ---
-- name: Install, configure, and run docker container with setup
-  hosts: local
-  become: yes
+- name: Install, configure, and run Docker container with setup
+  hosts: all
+  become: true
 
   vars:
-    project_dir: "{{ playbook_dir }}/../helloworld"  # зміна на підкаталог
+    project_dir: "{{ playbook_dir }}/../helloworld"  # way to path
     docker_image: helloworld_app
     docker_container: helloworld_app
     docker_tag: latest
 
-  tasks:
-    - name: Update and install required packages
-      apt:
-        update_cache: yes
+  tasks: # what should be done
+    - name: Update apt package index
+      ansible.builtin.apt:
+        update_cache: true
+      ignore_errors: true # try/ex struct
+
+    - name: Install required packages
+      ansible.builtin.apt:
         name:
+          - apt-transport-https
           - ca-certificates
           - curl
+          - software-properties-common
           - gnupg
           - lsb-release
           - docker-ce
         state: present
 
-    - name: Add Docker GPG key
-      ansible.builtin.command: >
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
-        gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-      args:
-        creates: /usr/share/keyrings/docker-archive-keyring.gpg
+    - name: Download Docker GPG key
+      ansible.builtin.get_url:
+        url: "https://download.docker.com/linux/ubuntu/gpg"
+        dest: "/usr/share/keyrings/docker-archive-keyring.gpg"
+        mode: '0644'
 
-    - name: Add Docker repository
-      apt_repository:
-        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu jammy stable"
+    - name: Set up the Docker stable repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         state: present
-        filename: docker
+        update_cache: true
 
-    - name: Ensure docker service is running
-      service:
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker-ce
+        state: present
+
+    - name: Add user to the docker group # for don't use sudo
+      ansible.builtin.user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: true
+
+    - name: Enable and start Docker service
+      ansible.builtin.service:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
-    - name: Create topsecret.txt in /etc directory
-      copy:
+    - name: Verify Docker installation
+      ansible.builtin.command:
+        cmd: docker --version
+      register: docker_version_output
+      changed_when: false # mark don't ch the system
+
+    - name: Output Docker version
+      ansible.builtin.debug:
+        msg: "{{ docker_version_output.stdout }}" # show result
+
+    - name: Create topsecret.txt in /etc directory # file for root
+      ansible.builtin.copy:
         content: "t0ps3cr3t"
         dest: /etc/topsecret.txt
         owner: root
@@ -49,22 +75,22 @@
         mode: '0600'
 
     - name: Create project directory
-      file:
+      ansible.builtin.file:
         path: "{{ project_dir }}"
         state: directory
         mode: '0755'
-        owner: "{{ ansible_env.USER }}"
-        group: "{{ ansible_env.USER }}"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
 
     - name: Check if Dockerfile exists
-      stat:
+      ansible.builtin.stat:
         path: "{{ project_dir }}/Dockerfile"
       register: dockerfile_stat
 
-    - name: Dockerfile does exist
-      debug:
-        msg: "Dockerfile does exist in {{ project_dir }}"
-      when: dockerfile_stat.stat.exists
+    - name: Dockerfile exists
+      ansible.builtin.debug:
+        msg: "Dockerfile exists in {{ project_dir }}"
+      when: dockerfile_stat.stat.exists # will be done if Dockerfile exists
 
     - name: Build Docker image
       community.docker.docker_image:
@@ -85,7 +111,19 @@
         ports:
           - "8080:8080"
 
-    - name: Remove dangling docker images
-      command: docker image prune -f
-      when: dockerfile_stat.stat.exists
+    - name: Create directory for Docker Compose
+      ansible.builtin.file:
+        path: /usr/local/bin/docker-compose
+        state: file
+        mode: '0755'
 
+    - name: Download Docker Compose
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Remove dangling Docker images # rmi dangling
+      ansible.builtin.command:
+        cmd: docker image prune -f
+      when: dockerfile_stat.stat.exists
