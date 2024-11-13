@@ -172,7 +172,7 @@ The Ansible playbook located at `ansible/playbook.yml` automates the provisionin
 The `light_checker` directory contains `lightChecker.py`, which determines whether the application should be running based on certain conditions.
 
 ## GitHub Actions Pipeline
-GitHub Actions pipeline automates the build, test.
+GitHub Actions pipeline automates the build docker img, test ansible, docker.
 
 ## Notes
 - Configuration Files: Store all configurations in the configs directory in JSON format.
