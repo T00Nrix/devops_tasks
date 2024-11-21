@@ -22,6 +22,9 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vbox|
     vbox.cpus = amount_cpu
     vbox.memory = amount_mem
+
+  # add perm for project dir
+  config.vm.synced_folder "../", "/home/vagrant/project", type: "virtualbox"
   end
 
   # Virtualbox specific settings
